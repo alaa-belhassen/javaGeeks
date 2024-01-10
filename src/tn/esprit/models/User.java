@@ -8,7 +8,7 @@ public class User {
 
     // zidou les champs lokhrin
     private Role role;
-
+    private PageActu pageActu;
     public int getIdUser() {
         return IdUser;
     }
