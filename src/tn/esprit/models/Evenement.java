@@ -1,6 +1,5 @@
 package tn.esprit.models;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -25,7 +24,7 @@ public class Evenement {
     public Evenement() {
     }
 
-    public Evenement(int idEvenement, String lieu, int max_places, float prix, String libelle, Date date_event, Timestamp time_event, int duration, Reserver reserver) {
+    public Evenement(int idEvenement, String lieu, int max_places, float prix, String libelle, Date date_event, Timestamp time_event, int duration,String status) {
         this.idEvenement = idEvenement;
         this.lieu = lieu;
         this.max_places = max_places;
@@ -34,7 +33,16 @@ public class Evenement {
         this.date_event = date_event;
         this.time_event = time_event;
         this.duration = duration;
-        this.reserver = reserver;
+        //this.reserver = reserver;
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public int getIdEvenement() {
@@ -103,6 +111,22 @@ public class Evenement {
 
     public Reserver getReserver() {
         return reserver;
+    }
+
+    @Override
+    public String toString() {
+        return "Evenement{" +
+                "idEvenement=" + idEvenement +
+                ", lieu='" + lieu + '\'' +
+                ", max_places=" + max_places +
+                ", prix=" + prix +
+                ", libelle='" + libelle + '\'' +
+                ", date_event=" + date_event +
+                ", time_event=" + time_event +
+                ", duration=" + duration +
+                ", status='" + status + '\'' +
+                ", reserver=" + reserver +
+                '}';
     }
 
     public void setReserver(Reserver reserver) {
