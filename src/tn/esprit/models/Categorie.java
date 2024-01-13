@@ -7,12 +7,15 @@ public class Categorie  {
     private int idCategorie;
     private String nom;
 
+    private String status;
+
     public Categorie() {
     }
 
-    public Categorie(int idCategorie, String nom) {
+    public Categorie(int idCategorie, String nom,String status) {
         this.idCategorie = idCategorie;
         this.nom = nom;
+        this.status=status;
     }
 
     public int getIdCategorie() {
@@ -31,7 +34,19 @@ public class Categorie  {
         this.nom = nom;
     }
 
+    @Override
+    public String toString() {
+        return "Categorie n°" +
+                 idCategorie +
+                ", nom='" + nom + '\'' +
+                '\n';
+    }
 
+    public String getStatus() {
+        return status;
+    }
 
-
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

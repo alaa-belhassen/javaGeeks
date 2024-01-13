@@ -9,14 +9,14 @@ import java.util.ArrayList;
 
 public class EvenementImplService implements ICrud<Evenement> {
 
-   private static ArrayList<Evenement> evenements;
+   private  ArrayList<Evenement> evenements;
 
     public EvenementImplService() throws SQLException {
         evenements = new ArrayList<>();
         this.getAll();
     }
 
-    public static ArrayList<Evenement> getEvenements() {
+    public  ArrayList<Evenement> getEvenements() {
         return evenements;
     }
 
@@ -64,16 +64,11 @@ public class EvenementImplService implements ICrud<Evenement> {
 
     @Override
     public boolean add(Evenement evenement) throws SQLException {
-        // Check if the event already exists
         String selectQuery = "SELECT * FROM evenement WHERE libelle = ?";
-
         try (PreparedStatement selectStatement = DbConnection.getCnx().prepareStatement(selectQuery)) {
             selectStatement.setString(1, evenement.getLibelle());
-
             ResultSet resultSet = selectStatement.executeQuery();
-
             if (!resultSet.next()) {
-                // Event does not exist, proceed with the insertion
                 String insertQuery = "INSERT INTO Evenement(idevenement,libelle, duration, date_event, time_event, max_places, prix, lieu,status) " +
                         "VALUES (?,?, ?, ?, ?, ?, ?, ?,?)";
 
@@ -90,7 +85,6 @@ public class EvenementImplService implements ICrud<Evenement> {
 
                     insertStatement.executeUpdate();
                     System.out.println("successfully added");
-                    // Assuming evenements is a List or some collection where you want to add the event
                     return evenements.add(evenement);
                 }
             } else {
@@ -106,49 +100,50 @@ public class EvenementImplService implements ICrud<Evenement> {
         Statement statement=DbConnection.getCnx().createStatement();
         String query2="update evenement set status= 'Supprimé' where idEvenement ="+evenement.getIdEvenement()+";";
         statement.executeUpdate(query2);
-        return  evenements.remove(evenement);
+
+        for (int i = 0; i < evenements.size() ; i++) {
+            if(evenements.get(i).getIdEvenement()==evenement.getIdEvenement()){
+                evenements.remove(evenements.get(i));
+            }
+        }
+
+
+        return  true;
     }
 
     @Override
     public boolean delete(int id) throws SQLException {
         String selectQuery = "SELECT * FROM evenement WHERE idEvenement = ? and status='valid'";
         String updateQuery = "UPDATE evenement SET status = 'Supprimé' WHERE idEvenement = ?";
-
         try (Connection connection = DbConnection.getCnx();
              PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
              PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
-
-            // Set parameter for the select statement
+            // parametre requete select
             selectStatement.setInt(1, id);
+            try {
+                ResultSet resultSet = selectStatement.executeQuery();
 
-            // Execute the select statement
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    // Set parameter for the update statement
-                    updateStatement.setInt(1, id);
 
-                    // Execute the update statement
+                    // parametre requete update
+                    updateStatement.setInt(1, id);
                     updateStatement.executeUpdate();
 
-                    // Create an Evenement object and populate it with the data from the ResultSet
-                    Evenement evenement = new Evenement();
-                    evenement.setIdEvenement(resultSet.getInt("idEvenement"));
-                    evenement.setLieu(resultSet.getString("lieu"));
-                    evenement.setMax_places(resultSet.getInt("max_places"));
-                    evenement.setPrix(resultSet.getFloat("prix"));
-                    evenement.setLibelle(resultSet.getString("libelle"));
-                    evenement.setDate_event(resultSet.getDate("date_event"));
-                    evenement.setTime_event(resultSet.getTimestamp("time_event"));
-                    evenement.setDuration(resultSet.getInt("duration"));
-                    evenement.setStatus(resultSet.getString("status"));
+                //    evenements.get(evenements.indexOf(resultSet));
 
-                    // Remove the Evenement from the collection
-                    return evenements.remove(evenement);
+                    for (int i = 0; i < evenements.size() ; i++) {
+                        if(evenements.get(i).getIdEvenement()==id){
+                            evenements.remove(evenements.get(i));
+                        }
+                    }
+                    return true;
 
                 } else {
-                    System.out.println("Event not found");
+                    System.out.println("l'evenement est déja supprimé");
                     return false;
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -156,12 +151,38 @@ public class EvenementImplService implements ICrud<Evenement> {
     @Override
     public boolean update(Evenement evenement) throws SQLException {
 
-        Statement statement=DbConnection.getCnx().createStatement();
-        String query2="update evenement set lieu="+evenement.getLieu()+",libelle="+evenement.getLibelle()+",max_places="+evenement.getMax_places()+",prix="+evenement.getPrix()+",date_event="+evenement.getDate_event()+",time_event="+evenement.getTime_event()+",duration="+evenement.getDuration()+" where idEvenement ="+evenement.getIdEvenement()+";";
-        statement.executeUpdate(query2);
+        try (PreparedStatement statement = DbConnection.getCnx().prepareStatement(
+                "UPDATE evenement SET lieu=?, libelle=?, max_places=?, prix=?, date_event=?, time_event=?, duration=? WHERE idEvenement=?")) {
 
+            statement.setString(1, evenement.getLieu());
+            statement.setString(2, evenement.getLibelle());
+            statement.setInt(3, evenement.getMax_places());
+            statement.setFloat(4, evenement.getPrix());
+            statement.setDate(5, new java.sql.Date(evenement.getDate_event().getTime()));
+            statement.setTimestamp(6, evenement.getTime_event());
+            statement.setInt(7, evenement.getDuration());
+            statement.setInt(8, evenement.getIdEvenement());
 
-        return false;
+            int rowsUpdated = statement.executeUpdate();
+            if(rowsUpdated > 0) {
+
+                for (int i = 0; i < evenements.size(); i++) {
+                    if (evenements.get(i).getIdEvenement() == evenement.getIdEvenement()) {
+                        evenements.get(i).setLieu(evenement.getLieu());
+                        evenements.get(i).setIdEvenement(evenement.getIdEvenement());
+                        evenements.get(i).setStatus(evenement.getStatus());
+                        evenements.get(i).setPrix(evenement.getPrix());
+                        evenements.get(i).setDuration(evenement.getDuration());
+                        evenements.get(i).setTime_event(evenement.getTime_event());
+                        evenements.get(i).setDate_event(evenement.getDate_event());
+                        evenements.get(i).setMax_places(evenement.getMax_places());
+                    }
+                }
+                return true;
+            }else {
+                return false;
+            }
+
     }
-}
+}}
 

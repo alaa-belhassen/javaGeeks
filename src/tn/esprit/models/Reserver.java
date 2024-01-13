@@ -1,21 +1,44 @@
 package tn.esprit.models;
 
+import java.time.LocalDate;
+
 public class Reserver {
 
     private int id_Res;
     private String codeQR;
     private float prix_total;
 
+    private LocalDate date_res;
     private Evenement Evenement;
-    private User user;
+   private User user_id;
+
+   private String status;
     public Reserver() {
     }
 
-    public Reserver(tn.esprit.models.Evenement evenement, User user, String codeQR) {
+    public Reserver(tn.esprit.models.Evenement evenement, User user, String codeQR,LocalDate date,String status) {
         Evenement = evenement;
-        this.user = user;
+        this.user_id = user;
         this.codeQR = codeQR;
         this.prix_total = prix_total;
+        this.date_res=date;
+        this.status=status;
+    }
+
+    public LocalDate getDate() {
+        return date_res;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date_res = date;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public int getId_Res() {
@@ -42,7 +65,7 @@ public class Reserver {
         this.prix_total = prix_total;
     }
 
-    public tn.esprit.models.Evenement getEvenement() {
+    public Evenement getEvenement() {
         return Evenement;
     }
 
@@ -51,10 +74,10 @@ public class Reserver {
     }
 
     public User getUser() {
-        return user;
+        return user_id;
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.user_id = user;
     }
 }
