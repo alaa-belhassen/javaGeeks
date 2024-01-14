@@ -1,6 +1,7 @@
 package tn.esprit.models;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Reserver {
 
@@ -12,18 +13,40 @@ public class Reserver {
     private Evenement Evenement;
    private User user_id;
 
-   private String status;
+
+
+    private String status;
+
     public Reserver() {
     }
 
-    public Reserver(tn.esprit.models.Evenement evenement, User user, String codeQR,LocalDate date,String status) {
-        Evenement = evenement;
-        this.user_id = user;
+    public Reserver(int id_Res, String codeQR, float prix_total, LocalDate date_res,Evenement evenement, User user_id,String status) {
+        this.id_Res = id_Res;
         this.codeQR = codeQR;
         this.prix_total = prix_total;
-        this.date_res=date;
-        this.status=status;
+        this.date_res = date_res;
+        this.Evenement = evenement;
+        this.user_id = user_id;
+        this.status = "valid";
     }
+
+    public LocalDate getDate_res() {
+        return date_res;
+    }
+
+    public void setDate_res(LocalDate date_res) {
+        this.date_res = date_res;
+    }
+
+    public User getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(User user_id) {
+        this.user_id = user_id;
+    }
+
+
 
     public LocalDate getDate() {
         return date_res;
@@ -69,12 +92,34 @@ public class Reserver {
         return Evenement;
     }
 
-    public void setEvenement(tn.esprit.models.Evenement evenement) {
+    public void setEvenement(Evenement evenement) {
         Evenement = evenement;
     }
 
     public User getUser() {
         return user_id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Reserver reserver)) return false;
+        return getId_Res() == reserver.getId_Res() && Float.compare(reserver.getPrix_total(), getPrix_total()) == 0 && Objects.equals(getCodeQR(), reserver.getCodeQR()) && Objects.equals(date_res, reserver.date_res) && Objects.equals(getEvenement(), reserver.getEvenement()) && Objects.equals(user_id, reserver.user_id) && Objects.equals(getStatus(), reserver.getStatus());
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "Reserver{" +
+                "id_Res=" + id_Res +
+                ", codeQR='" + codeQR + '\'' +
+                ", prix_total=" + prix_total +
+                ", date_res=" + date_res +
+                ", Evenement=" + Evenement +
+                ", user_id=" + user_id +
+                ", status='" + status + '\'' +
+                '}';
     }
 
     public void setUser(User user) {

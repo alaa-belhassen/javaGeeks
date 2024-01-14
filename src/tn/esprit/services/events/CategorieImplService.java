@@ -10,21 +10,12 @@ import java.util.ArrayList;
 
 public class CategorieImplService implements ICrud<Categorie> {
 
-    private  ArrayList<Categorie> categories;
 
 
     public CategorieImplService() throws SQLException {
-        categories = new ArrayList<>();
         this.getAll();
     }
 
-    public ArrayList<Categorie> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(ArrayList<Categorie> categories) {
-        this.categories = categories;
-    }
 
     @Override
     public ArrayList<Categorie> getAll() throws SQLException {
@@ -38,11 +29,10 @@ public class CategorieImplService implements ICrud<Categorie> {
             categorie.setIdCategorie(resultSet.getInt(1));
             categorie.setNom(resultSet.getString(2));
 
-            categories.add(categorie);
         }
 
 
-        return categories ;
+        return null ;
     }
 
     @Override
@@ -63,7 +53,7 @@ public class CategorieImplService implements ICrud<Categorie> {
 
                     insertStatement.executeUpdate();
                     System.out.println("successfully added");
-                    return categories.add(categorie);
+                    return true;
                 }
             } else {
                 System.out.println("category already exists");
@@ -78,13 +68,6 @@ public class CategorieImplService implements ICrud<Categorie> {
         Statement statement=DbConnection.getCnx().createStatement();
         String query2="update categorie set status= 'Supprimé' where idcategorie ="+categorie.getIdCategorie()+";";
         statement.executeUpdate(query2);
-
-        for (int i = 0; i < categories.size() ; i++) {
-            if(categories.get(i).getIdCategorie()==categorie.getIdCategorie()){
-                categories.remove(categories.get(i));
-            }
-        }
-
         return true;
     }
 
@@ -107,18 +90,15 @@ public class CategorieImplService implements ICrud<Categorie> {
                     // parametre requete update
                     updateStatement.setInt(1, id);
                     updateStatement.executeUpdate();
+                    System.out.println("deleted successfully");
 
                     //    evenements.get(evenements.indexOf(resultSet));
 
-                    for (int i = 0; i < categories.size() ; i++) {
-                        if(categories.get(i).getIdCategorie()==id){
-                            categories.remove(categories.get(i));
-                        }
-                    }
+
                     return true;
 
                 } else {
-                    System.out.println("la categorie est déja supprimé");
+                    System.out.println("category already deleted");
                     return false;
                 }
             } catch (SQLException e) {
@@ -127,39 +107,33 @@ public class CategorieImplService implements ICrud<Categorie> {
 
     }
     }
-/*
+
     @Override
     public boolean update(Categorie categorie) throws SQLException {
         try {
-            System.out.println(DbConnection.getCnx().isClosed());
-            DbConnection db1 = DbConnection.getInstance();
-            db1.setCnx(DbConnection.getCnx());
-            System.out.println(db1.getCnx().isClosed());
 
             PreparedStatement statement = DbConnection.getCnx().prepareStatement(
                     "UPDATE categorie SET nom=? WHERE idcategorie=?");
-            statement.setInt(1, categorie.getIdCategorie());
+            statement.setString(1, categorie.getNom());
+            statement.setInt(2, categorie.getIdCategorie());
 
 
             int rowsUpdated = statement.executeUpdate();
-            if(rowsUpdated > 0) {
-
-                for (int i = 0; i < categories.size(); i++) {
-                    if (categories.get(i).getIdCategorie() == categorie.getIdCategorie()) {
-                        categories.get(i).setNom(categorie.getNom());
-
-                    }
-                }
+            if (rowsUpdated > 0) {
+                System.out.println("updated successfully");
                 return true;
-            }else {
+            } else {
                 return false;
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }*/
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
 
+
+/*
     @Override
     public boolean update(Categorie categorie) {
         String req = "UPDATE \"Categorie\" "
@@ -177,7 +151,7 @@ public class CategorieImplService implements ICrud<Categorie> {
 
         return er != 0;
     }
-
+*/
 
 
 }

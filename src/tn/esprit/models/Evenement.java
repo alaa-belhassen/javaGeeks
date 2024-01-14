@@ -1,6 +1,8 @@
 package tn.esprit.models;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 public class Evenement {
@@ -10,8 +12,8 @@ public class Evenement {
     private int max_places;
     private float prix;
     private String libelle;
-    private Date date_event;
-    private Timestamp time_event;
+    private LocalDate date_event;
+    private LocalTime time_event;
     private int duration;
     private String  status;
 
@@ -24,7 +26,7 @@ public class Evenement {
     public Evenement() {
     }
 
-    public Evenement(int idEvenement, String lieu, int max_places, float prix, String libelle, Date date_event, Timestamp time_event, int duration,String status) {
+    public Evenement(int idEvenement, String lieu, int max_places, float prix, String libelle, LocalDate date_event, LocalTime time_event, int duration,String status) {
         this.idEvenement = idEvenement;
         this.lieu = lieu;
         this.max_places = max_places;
@@ -85,19 +87,19 @@ public class Evenement {
         this.libelle = libelle;
     }
 
-    public Date getDate_event() {
+    public LocalDate getDate_event() {
         return date_event;
     }
 
-    public void setDate_event(Date date_event) {
+    public void setDate_event(LocalDate date_event) {
         this.date_event = date_event;
     }
 
-    public Timestamp getTime_event() {
+    public LocalTime getTime_event() {
         return time_event;
     }
 
-    public void setTime_event(Timestamp time_event) {
+    public void setTime_event(LocalTime time_event) {
         this.time_event = time_event;
     }
 

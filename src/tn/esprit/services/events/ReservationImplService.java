@@ -13,20 +13,17 @@ import java.util.ArrayList;
 public class ReservationImplService implements ICrud<Reserver> {
 
 
-    private  ArrayList<Reserver> reservers;
 
-
-    public ArrayList<Reserver> getReservers() {
-        return reservers;
+    public ReservationImplService() throws SQLException {
+        getAll();
     }
 
-    public void setReservers(ArrayList<Reserver> reservers) {
-        this.reservers = reservers;
-    }
+
+
 
     @Override
-    public ArrayList getAll() throws SQLException {
-        String query1="select * from reservation where status='valid' ;";
+    public ArrayList<Reserver> getAll() throws SQLException {
+        String query1="select * from reserver where status='valid' ;";
         Statement statement= DbConnection.getCnx().createStatement();
         ResultSet resultSet= statement.executeQuery(query1);
         while (resultSet.next())
@@ -35,12 +32,12 @@ public class ReservationImplService implements ICrud<Reserver> {
             reserver.setId_Res(resultSet.getInt(1));
             reserver.setCodeQR(resultSet.getString(2));
             reserver.setPrix_total(resultSet.getFloat(3));
-            reserver.setEvenement((Evenement) resultSet.getObject(4));
-            reserver.setUser((User) resultSet.getObject(5));
-
-            reservers.add(reserver);
+            reserver.setDate(resultSet.getDate(4).toLocalDate());
+          //  reserver.setEvenement((Evenement) resultSet.getObject(5));
+            //reserver.setUser_id((User) resultSet.getObject(6));
+            reserver.setStatus(resultSet.getString(7));
         }
-        return reservers;
+        return null;
     }
 
     @Override
@@ -51,7 +48,7 @@ public class ReservationImplService implements ICrud<Reserver> {
             selectStatement.setString(1, reserver.getCodeQR());
             ResultSet resultSet = selectStatement.executeQuery();
             if (!resultSet.next()) {
-                String insertQuery = "INSERT INTO reserver(id_Res,codeQR,prix_total,date_res,evenement,user_id,status) " +
+                String insertQuery = "INSERT INTO reserver(id_Res,codeQR,prix_total,date_res,idevenement,user_id,status) " +
                         "VALUES (?,?,?,?,?,?,?)";
 
                 try (PreparedStatement insertStatement = DbConnection.getCnx().prepareStatement(insertQuery)) {
@@ -59,13 +56,13 @@ public class ReservationImplService implements ICrud<Reserver> {
                     insertStatement.setString(2, reserver.getCodeQR());
                     insertStatement.setFloat(3, reserver.getPrix_total());
                     insertStatement.setDate(4, Date.valueOf(reserver.getDate()));
-                    insertStatement.setObject(5, reserver.getEvenement());
-                    insertStatement.setObject(6, reserver.getUser());
+                    insertStatement.setInt(5, reserver.getEvenement().getIdEvenement());
+                    insertStatement.setInt(6, reserver.getUser().getIdUser());
                     insertStatement.setString(7, "valid");
 
                     insertStatement.executeUpdate();
                     System.out.println("successfully added");
-                    return reservers.add(reserver);
+                    return true;
                 }
             } else {
                 System.out.println("reservation already made");
@@ -81,17 +78,10 @@ public class ReservationImplService implements ICrud<Reserver> {
     @Override
     public boolean delete(Reserver reserver) throws SQLException {
         Statement statement=DbConnection.getCnx().createStatement();
-        String query2="update reserver set status= 'Supprimé' where idEvenement ="+reserver.getId_Res()+";";
+        String query2="update reserver set status= 'Supprimé' where id_res ="+reserver.getId_Res()+";";
         statement.executeUpdate(query2);
 
-        for (int i = 0; i < reservers.size() ; i++) {
-            if(reservers.get(i).getId_Res()==reserver.getId_Res()){
-                reservers.remove(reservers.get(i));
-            }
-        }
-
-
-        return  true;
+                return  true;
     }
 
     @Override
@@ -115,11 +105,7 @@ public class ReservationImplService implements ICrud<Reserver> {
 
                     //    evenements.get(evenements.indexOf(resultSet));
 
-                    for (int i = 0; i < reservers.size() ; i++) {
-                        if(reservers.get(i).getId_Res()==id){
-                            reservers.remove(reservers.get(i));
-                        }
-                    }
+                    System.out.println("deleted successfully");
                     return true;
 
                 } else {
@@ -135,24 +121,16 @@ public class ReservationImplService implements ICrud<Reserver> {
     @Override
     public boolean update(Reserver reserver) throws SQLException {
         try (PreparedStatement statement = DbConnection.getCnx().prepareStatement(
-                "UPDATE evenement SET lieu=?, libelle=?, max_places=?, prix=?, date_event=?, time_event=?, duration=? WHERE idEvenement=?")) {
+                "UPDATE reserver SET codeqr=?, prix_total=? WHERE id_res=?")) {
 
-            statement.setFloat(1, reserver.getPrix_total());
-            statement.setDate(2, Date.valueOf(reserver.getDate()));
-            statement.setFloat(3, reserver.getPrix_total());
-            statement.setString(4, reserver.getCodeQR());
+            statement.setString(1, reserver.getCodeQR());
+            statement.setFloat(2, reserver.getPrix_total());
+            statement.setInt(3, reserver.getId_Res());
 
             int rowsUpdated = statement.executeUpdate();
             if(rowsUpdated > 0) {
 
-                for (int i = 0; i < reservers.size(); i++) {
-                    if (reservers.get(i).getId_Res() == reserver.getId_Res()) {
-                        reservers.get(i).setDate(reserver.getDate());
-                        reservers.get(i).setPrix_total(reserver.getPrix_total());
-                        reservers.get(i).setCodeQR(reserver.getCodeQR());
-
-                    }
-                }
+                System.out.println("updated successfully");
                 return true;
             }else {
                 return false;

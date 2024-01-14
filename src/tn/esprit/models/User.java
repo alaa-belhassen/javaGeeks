@@ -9,6 +9,13 @@ public class User {
     // zidou les champs lokhrin
     private Role role;
 
+    public User() {
+    }
+
+    public User(int idUser) {
+        IdUser = idUser;
+    }
+
     public int getIdUser() {
         return IdUser;
     }
