@@ -4,6 +4,7 @@ import tn.esprit.models.Categorie;
 import tn.esprit.models.Evenement;
 import tn.esprit.services.ICrud;
 import tn.esprit.utils.DbConnection;
+import tn.esprit.utils.Status;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ public class CategorieImplService implements ICrud<Categorie> {
     @Override
     public ArrayList<Categorie> getAll() throws SQLException {
 
-        String query1="select * from categorie  ;";
+        ArrayList<Categorie> categories=new ArrayList<>();
+        String query1="select * from categorie where status='"+ Status.VALID.toString() +"';";
         Statement statement= DbConnection.getCnx().createStatement();
         ResultSet resultSet= statement.executeQuery(query1);
         while (resultSet.next())
@@ -28,11 +30,10 @@ public class CategorieImplService implements ICrud<Categorie> {
             Categorie categorie=new Categorie();
             categorie.setIdCategorie(resultSet.getInt(1));
             categorie.setNom(resultSet.getString(2));
-
+            categories.add(categorie);
         }
 
-
-        return null ;
+        return categories ;
     }
 
     @Override
@@ -43,13 +44,12 @@ public class CategorieImplService implements ICrud<Categorie> {
             selectStatement.setString(1, categorie.getNom());
             ResultSet resultSet = selectStatement.executeQuery();
             if (!resultSet.next()) {
-                String insertQuery = "INSERT INTO categorie(idcategorie,nom,status) " +
-                        "VALUES (?,?,?)";
+                String insertQuery = "INSERT INTO categorie(nom,status) " +
+                        "VALUES (?,?)";
 
                 try (PreparedStatement insertStatement = DbConnection.getCnx().prepareStatement(insertQuery)) {
-                    insertStatement.setInt(1, categorie.getIdCategorie());
-                    insertStatement.setString(2, categorie.getNom());
-                    insertStatement.setString(3, "valid");
+                    insertStatement.setString(1, categorie.getNom());
+                    insertStatement.setString(2, Status.VALID.toString());
 
                     insertStatement.executeUpdate();
                     System.out.println("successfully added");
@@ -66,7 +66,7 @@ public class CategorieImplService implements ICrud<Categorie> {
     @Override
     public boolean delete(Categorie categorie) throws SQLException {
         Statement statement=DbConnection.getCnx().createStatement();
-        String query2="update categorie set status= 'Supprimé' where idcategorie ="+categorie.getIdCategorie()+";";
+        String query2="update categorie set status= '"+Status.SUPPRIMER.toString()+"' where idcategorie ="+categorie.getIdCategorie()+";";
         statement.executeUpdate(query2);
         return true;
     }
@@ -74,8 +74,8 @@ public class CategorieImplService implements ICrud<Categorie> {
     @Override
     public boolean delete(int id) throws SQLException {
 
-        String selectQuery = "SELECT * FROM categorie WHERE idcategorie = ? and status='valid'";
-        String updateQuery = "UPDATE categorie SET status = 'Supprimé' WHERE idcategorie = ?";
+        String selectQuery = "SELECT * FROM categorie WHERE idcategorie = ? and status='"+Status.VALID+"'";
+        String updateQuery = "UPDATE categorie SET status = '"+Status.SUPPRIMER+"' WHERE idcategorie = ?";
         try (Connection connection = DbConnection.getCnx();
              PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
              PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
@@ -93,8 +93,6 @@ public class CategorieImplService implements ICrud<Categorie> {
                     System.out.println("deleted successfully");
 
                     //    evenements.get(evenements.indexOf(resultSet));
-
-
                     return true;
 
                 } else {
@@ -110,6 +108,7 @@ public class CategorieImplService implements ICrud<Categorie> {
 
     @Override
     public boolean update(Categorie categorie) throws SQLException {
+
         try {
 
             PreparedStatement statement = DbConnection.getCnx().prepareStatement(

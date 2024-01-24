@@ -9,11 +9,12 @@ public class Categorie  {
 
     private String status;
 
+
+
     public Categorie() {
     }
 
-    public Categorie(int idCategorie, String nom,String status) {
-        this.idCategorie = idCategorie;
+    public Categorie( String nom,String status) {
         this.nom = nom;
         this.status=status;
     }
@@ -36,9 +37,8 @@ public class Categorie  {
 
     @Override
     public String toString() {
-        return "Categorie n°" +
-                 idCategorie +
-                ", nom='" + nom + '\'' +
+        return
+                " nom='" + nom + '\'' +
                 '\n';
     }
 

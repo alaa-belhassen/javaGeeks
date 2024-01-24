@@ -1,8 +1,12 @@
 package tn.esprit.services.events;
 
+import org.postgresql.jdbc2.ArrayAssistant;
+import tn.esprit.models.Categorie;
 import tn.esprit.models.Evenement;
+import tn.esprit.models.User;
 import tn.esprit.services.ICrud;
 import tn.esprit.utils.DbConnection;
+import tn.esprit.utils.Status;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,14 +15,13 @@ public class EvenementImplService implements ICrud<Evenement> {
 
 
     public EvenementImplService() throws SQLException {
-        this.getAll();
     }
 
 
     @Override
     public ArrayList<Evenement> getAll() throws SQLException {
-
-        String query1="select * from evenement where status='valid' ;";
+        ArrayList<Evenement> evenements = new ArrayList<Evenement>();
+        String query1="select * from evenement where status='"+ Status.VALID.toString() +"' ;";
         Statement statement=DbConnection.getCnx().createStatement();
         ResultSet resultSet= statement.executeQuery(query1);
       while (resultSet.next()) {
@@ -32,22 +35,30 @@ public class EvenementImplService implements ICrud<Evenement> {
           evenement.setTime_event(resultSet.getTime(7).toLocalTime());
           evenement.setDuration(resultSet.getInt(8));
           evenement.setStatus(resultSet.getString(9));
+
+          String query3="select * from categorie where idcategorie=?" ;
+          PreparedStatement selectStatement = DbConnection.getCnx().prepareStatement(query3);
+          selectStatement.setInt(1, resultSet.getInt("idcategorie"));
+          ResultSet resultSet3= selectStatement.executeQuery();
+
+
+          Categorie categorie1=new Categorie();
+            if (resultSet3.next()) {
+                categorie1.setIdCategorie(resultSet3.getInt("idcategorie"));
+                categorie1.setNom(resultSet3.getString("nom"));
+
+
+            }
+          evenement.setId_categorie(categorie1);
+
+          evenement.setPhoto(resultSet.getString(11));
+
+          evenement.setIdUser(resultSet.getInt(12));
+
+          evenements.add(evenement);
       }
 
-        /*
-        for (int i = 0; i < evenements.size() ; i++) {
-            System.out.println("Id Evennement : "+evenements.get(i).getIdEvenement());
-            System.out.println("Lieu : "+evenements.get(i).getLieu());
-            System.out.println("Nom evenement : "+evenements.get(i).getLibelle());
-            System.out.println("Duration : "+evenements.get(i).getDuration());
-            System.out.println("Max places : "+evenements.get(i).getMax_places());
-            System.out.println("Date : "+evenements.get(i).getDate_event());
-            System.out.println("Time : "+evenements.get(i).getTime_event());
-            System.out.println("Prix : "+evenements.get(i).getPrix());
-            System.out.println("Status : "+evenements.get(i).getStatus());
-
-        }*/
-        return null;
+        return evenements;
     }
 
     @Override
@@ -57,19 +68,21 @@ public class EvenementImplService implements ICrud<Evenement> {
             selectStatement.setString(1, evenement.getLibelle());
             ResultSet resultSet = selectStatement.executeQuery();
             if (!resultSet.next()) {
-                String insertQuery = "INSERT INTO Evenement(idevenement,libelle, duration, date_event, time_event, max_places, prix, lieu,status) " +
-                        "VALUES (?,?, ?, ?, ?, ?, ?, ?,?)";
+                String insertQuery = "INSERT INTO Evenement(libelle, duration, date_event, time_event, max_places, prix, lieu,status,photo,idcategorie,iduser) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?)";
 
                 try (PreparedStatement insertStatement = DbConnection.getCnx().prepareStatement(insertQuery)) {
-                    insertStatement.setInt(1, evenement.getIdEvenement());
-                    insertStatement.setString(2, evenement.getLibelle());
-                    insertStatement.setInt(3, evenement.getDuration());
-                    insertStatement.setDate(4, Date.valueOf(evenement.getDate_event()));
-                    insertStatement.setTime(5, Time.valueOf(evenement.getTime_event())); // Assuming time_event is of type TIMESTAMP
-                    insertStatement.setInt(6, evenement.getMax_places());
-                    insertStatement.setDouble(7, evenement.getPrix());
-                    insertStatement.setString(8, evenement.getLieu());
-                    insertStatement.setString(9, evenement.getStatus());
+                    insertStatement.setString(1, evenement.getLibelle());
+                    insertStatement.setInt(2, evenement.getDuration());
+                    insertStatement.setDate(3, Date.valueOf(evenement.getDate_event()));
+                    insertStatement.setTime(4, Time.valueOf(evenement.getTime_event())); // Assuming time_event is of type TIMESTAMP
+                    insertStatement.setInt(5, evenement.getMax_places());
+                    insertStatement.setDouble(6, evenement.getPrix());
+                    insertStatement.setString(7, evenement.getLieu());
+                    insertStatement.setString(8, evenement.getStatus());
+                    insertStatement.setString(9, evenement.getPhoto());
+                    insertStatement.setInt(10, evenement.getId_categorie().getIdCategorie());
+                    insertStatement.setInt(11, evenement.getIdUser());
 
                     insertStatement.executeUpdate();
                     System.out.println("successfully added");

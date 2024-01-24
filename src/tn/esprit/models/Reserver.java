@@ -11,8 +11,7 @@ public class Reserver {
 
     private LocalDate date_res;
     private Evenement Evenement;
-   private User user_id;
-
+   private User idUser;
 
 
     private String status;
@@ -20,13 +19,13 @@ public class Reserver {
     public Reserver() {
     }
 
-    public Reserver(int id_Res, String codeQR, float prix_total, LocalDate date_res,Evenement evenement, User user_id,String status) {
-        this.id_Res = id_Res;
+    public Reserver(String codeQR, float prix_total, LocalDate date_res,Evenement evenement, User idUser,String status) {
+
         this.codeQR = codeQR;
         this.prix_total = prix_total;
         this.date_res = date_res;
         this.Evenement = evenement;
-        this.user_id = user_id;
+        this.idUser = idUser;
         this.status = "valid";
     }
 
@@ -39,11 +38,11 @@ public class Reserver {
     }
 
     public User getUser_id() {
-        return user_id;
+        return idUser;
     }
 
     public void setUser_id(User user_id) {
-        this.user_id = user_id;
+        this.idUser = user_id;
     }
 
 
@@ -97,17 +96,23 @@ public class Reserver {
     }
 
     public User getUser() {
-        return user_id;
+        return idUser;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Reserver reserver)) return false;
-        return getId_Res() == reserver.getId_Res() && Float.compare(reserver.getPrix_total(), getPrix_total()) == 0 && Objects.equals(getCodeQR(), reserver.getCodeQR()) && Objects.equals(date_res, reserver.date_res) && Objects.equals(getEvenement(), reserver.getEvenement()) && Objects.equals(user_id, reserver.user_id) && Objects.equals(getStatus(), reserver.getStatus());
+        return getId_Res() == reserver.getId_Res() && Float.compare(reserver.getPrix_total(), getPrix_total()) == 0 && Objects.equals(getCodeQR(), reserver.getCodeQR()) && Objects.equals(date_res, reserver.date_res) && Objects.equals(getEvenement(), reserver.getEvenement()) && Objects.equals(idUser, reserver.idUser) && Objects.equals(getStatus(), reserver.getStatus());
     }
 
+    public User getIdUser() {
+        return idUser;
+    }
 
+    public void setIdUser(User idUser) {
+        this.idUser = idUser;
+    }
 
     @Override
     public String toString() {
@@ -117,12 +122,12 @@ public class Reserver {
                 ", prix_total=" + prix_total +
                 ", date_res=" + date_res +
                 ", Evenement=" + Evenement +
-                ", user_id=" + user_id +
+                ", user_id=" + idUser +
                 ", status='" + status + '\'' +
                 '}';
     }
 
     public void setUser(User user) {
-        this.user_id = user;
+        this.idUser = user;
     }
 }
