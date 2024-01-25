@@ -6,10 +6,10 @@ import java.sql.SQLException;
 
 public class DbConnection {
     private String user = "postgres";
-    private String password = "postgres";
-    private String url = "jdbc:postgresql://localhost:5433/javageeks";
+    private String password = "admin";
+    private String url = "jdbc:postgresql://localhost:5432/javageeks";
     private static DbConnection instance;
-    private Connection cnx;
+    private static Connection cnx;
 
     private DbConnection()  {
         try {
@@ -24,4 +24,12 @@ public class DbConnection {
         if(instance==null) instance= new DbConnection();
         return instance;
     };
+
+    public static Connection getCnx() {
+        return cnx;
+    }
+
+    public static void setInstance(DbConnection instance) {
+        DbConnection.instance = instance;
+    }
 }
